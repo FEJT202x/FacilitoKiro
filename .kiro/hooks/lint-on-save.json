@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "lint-on-save",
+      "trigger": "PostFileSave",
+      "matcher": "\\.([jt]s|[jt]sx?)$",
+      "action": {
+        "type": "command",
+        "command": "npm run lint -- --fix"
+      }
+    }
+  ]
+}

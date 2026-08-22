@@ -1,0 +1,26 @@
+{
+  "version": "v1",
+  "agents": [
+    {
+      "name": "custom-developer",
+      "description": "Custom agent for project-specific development tasks",
+      "role": "senior-developer",
+      "capabilities": [
+        "code_generation",
+        "code_review",
+        "debugging",
+        "testing"
+      ],
+      "configuration": {
+        "max_retries": 3,
+        "timeout_seconds": 300,
+        "preferred_language": "typescript"
+      },
+      "knowledge_base": [
+        "project_structure",
+        "code_conventions",
+        "security_guidelines"
+      ]
+    }
+  ]
+}
