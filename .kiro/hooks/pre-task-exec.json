@@ -1,0 +1,22 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "security-scan",
+      "trigger": "PreTaskExec",
+      "action": {
+        "type": "command",
+        "command": "echo \"Running security scan...\" && npm audit --audit-level=high || exit 2"
+      }
+    },
+    {
+      "name": "dependency-check",
+      "trigger": "PreTaskExec",
+      "matcher": "install|add|update",
+      "action": {
+        "type": "command",
+        "command": "echo \"Checking dependencies...\" && npm outdated || exit 0"
+      }
+    }
+  ]
+}
