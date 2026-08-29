@@ -1,0 +1,27 @@
+{
+  "version": "v1",
+  "agents": [
+    {
+      "name": "web-developer",
+      "description": "Custom agent for React/Node.js web application development",
+      "role": "senior-developer",
+      "capabilities": [
+        "code_generation",
+        "code_review",
+        "debugging",
+        "testing"
+      ],
+      "configuration": {
+        "max_retries": 3,
+        "timeout_seconds": 300,
+        "preferred_language": "typescript"
+      },
+      "knowledge_base": [
+        "react_typescript",
+        "express_js",
+        "postgresql",
+        "docker"
+      ]
+    }
+  ]
+}
