@@ -15,20 +15,21 @@ This document defines the development workflows and processes for the Prostate M
 - [ ] Establish conventions and standards
 - [ ] Document security requirements
 
-### Phase 3: Development (v1)
-- [ ] Set up React frontend with TypeScript
-- [ ] Implement basic MRI image viewer
-- [ ] Add zoom and pan functionality
-- [ ] Implement file loading
-- [ ] Display image metadata
+### Phase 3: Development (v1 - DICOM Viewer)
+- [ ] Set up React + TypeScript + Vite project
+- [ ] Integrate Cornerstone3D and DICOM image loader
+- [ ] Implement DICOM file/series loading (drag & drop / picker)
+- [ ] Render slices with window/level (VOI LUT)
+- [ ] Add stack scroll, zoom, pan, and WW/WC tools
+- [ ] Display DICOM metadata panel
+- [ ] Handle malformed/unsupported DICOM gracefully
 - [ ] Write tests
-- [ ] Document API
 
 ### Phase 4: Iteration (v2+)
-- [ ] DICOM file support
-- [ ] Multi-planar reconstruction
-- [ ] 3D visualization
-- [ ] Clinical annotations
+- [ ] Multi-planar reconstruction (MPR)
+- [ ] Segmentation overlays
+- [ ] DICOMweb / PACS (Orthanc) integration
+- [ ] Clinical annotations and measurements
 - [ ] Production deployment
 
 ## Git Workflow

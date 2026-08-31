@@ -75,12 +75,14 @@ Sample medical imaging data for development and testing (DICOM files, etc.).
 
 | Layer | Technology | Notes |
 |-------|-----------|-------|
-| Frontend | React 18, TypeScript, Canvas/WebGL | Medical image rendering |
-| Image Processing | OHIF Viewer / Papaya / Custom | DICOM/MRI visualization |
-| Backend | Node.js, Express.js | RESTful API for metadata |
-| Database | PostgreSQL + JSONB | Store DICOM metadata, annotations |
+| Frontend | React 18, TypeScript, Vite | Modern SPA base |
+| Rendering | Cornerstone3D (WebGL) | GPU-accelerated DICOM/MRI rendering (v1) |
+| DICOM loading | @cornerstonejs/dicom-image-loader + dicom-parser | Parse DICOM P10, register image loaders (v1) |
+| Backend | Node.js, Express.js | DICOMweb proxy / metadata API (v4+) |
+| Database | PostgreSQL + JSONB | Store DICOM metadata, annotations (v4+) |
+| PACS/Storage | Orthanc (DICOMweb) | Server-backed image storage (v4+) |
 | Infrastructure | Docker, GitHub Actions | CI/CD and containerization |
-| Medical Standards | DICOM, HL7 | Medical imaging standards |
+| Medical Standards | DICOM, DICOMweb, HL7 | Medical imaging standards |
 
 ## Conventions
 

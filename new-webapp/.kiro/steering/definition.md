@@ -16,78 +16,100 @@ This document defines the requirements, specifications, and conventions for the 
 
 ### What is being built in this phase:
 
-**A simple MRI image viewer for prostate cancer imaging.**
+**A DICOM-based MRI viewer for prostate cancer imaging.**
 
-- View MRI scan images in 2D
-- Basic image navigation (zoom, pan)
-- Simple interface for clinical review
+MRI scans are medical DICOM data — not flat images. From v1 the viewer works with
+real DICOM files, preserving clinical metadata, pixel spacing, and window/level.
+
+- Load and parse DICOM files (single files and multi-slice series)
+- Render MRI slices with correct grayscale window/level (VOI LUT)
+- Navigate slices within a series (scroll/stack)
+- Basic navigation: zoom, pan, window/level adjustment
+- Display DICOM metadata (patient, study, series, sequence)
 
 ### Iterative Nature:
 
 | Phase | Scope | Complexity |
 |-------|-------|------------|
-| v1 | Basic image viewer | Simple |
-| v2 | Multi-planar reconstruction | Medium |
-| v3 | Segmentation visualization | Complex |
-| v4 | DICOM integration | Complex |
-| v5 | Clinical workflow tools | Advanced |
+| v1 | DICOM 2D viewer (single series, window/level, slice scroll) | Medium |
+| v2 | Multi-planar reconstruction (axial/sagittal/coronal) | Medium |
+| v3 | Segmentation visualization / overlays | Complex |
+| v4 | DICOMweb + PACS integration (server-backed) | Complex |
+| v5 | Clinical workflow tools (annotations, measurements, reporting) | Advanced |
 | v6+ | Production-ready with feedback | Evolving |
 
 ## Requirements
 
-### Functional Requirements (v1 - Basic Viewer)
+### Functional Requirements (v1 - DICOM Viewer)
 
 | ID | Requirement | Priority |
 |----|-------------|----------|
-| FR-001 | Display MRI scan images in 2D | High |
-| FR-002 | Basic image navigation (zoom, pan) | High |
-| FR-003 | Load MRI files from local storage | High |
-| FR-004 | Display image metadata | Medium |
-| FR-005 | Switch between different MRI sequences | Medium |
+| FR-001 | Load and parse DICOM files (P10, common transfer syntaxes) | High |
+| FR-002 | Render MRI slices with correct window/level (VOI LUT) | High |
+| FR-003 | Load a full DICOM series and scroll through slices | High |
+| FR-004 | Basic navigation: zoom, pan, window/level | High |
+| FR-005 | Display DICOM metadata (patient/study/series/sequence) | High |
+| FR-006 | Load DICOM from local storage (drag & drop / file picker) | High |
+| FR-007 | Switch between MRI sequences within a study | Medium |
 
 ### Non-Functional Requirements (v1)
 
 | ID | Requirement | Priority |
 |----|-------------|----------|
-| NFR-001 | Image rendering performance | High |
-| NFR-002 | Responsive UI on desktop | High |
-| NFR-003 | Cross-browser compatibility | Medium |
-| NFR-004 | Clear error handling | High |
+| NFR-001 | GPU-accelerated rendering, smooth slice scrolling | High |
+| NFR-002 | Handle large series (hundreds of slices) without freezing | High |
+| NFR-003 | Responsive UI on desktop | High |
+| NFR-004 | Clear error handling for malformed/unsupported DICOM | High |
+| NFR-005 | Patient data stays client-side (no upload in v1) | High |
 
 ## Technical Specifications (v1)
 
 ### Architecture
 
 ```
-┌─────────────────────────────────────────┐
-│          Client Browser                  │
-│  ┌───────────────────────────────────┐  │
-│  │   MRI Viewer (React + Canvas)     │  │
-│  │   - Image rendering layer         │  │
-│  │   - Interaction layer             │  │
-│  │   - Metadata display              │  │
-│  └───────────────────────────────────┘  │
-└─────────────────────────────────────────┘
+┌───────────────────────────────────────────────┐
+│               Client Browser                   │
+│  ┌─────────────────────────────────────────┐  │
+│  │   MRI Viewer (React + TypeScript)       │  │
+│  │   ┌───────────────────────────────────┐ │  │
+│  │   │ Cornerstone3D (WebGL rendering)   │ │  │
+│  │   │  - Viewport / stack rendering     │ │  │
+│  │   │  - VOI LUT (window/level)         │ │  │
+│  │   │  - Tools: zoom, pan, scroll, WWWC │ │  │
+│  │   └───────────────────────────────────┘ │  │
+│  │   ┌───────────────────────────────────┐ │  │
+│  │   │ DICOM Image Loader (dicom-parser) │ │  │
+│  │   │  - Parse P10 + transfer syntaxes  │ │  │
+│  │   │  - Extract metadata               │ │  │
+│  │   └───────────────────────────────────┘ │  │
+│  └─────────────────────────────────────────┘  │
+└───────────────────────────────────────────────┘
 ```
 
 ### Technology Stack (v1)
 
 | Layer | Technology | Notes |
 |-------|-----------|-------|
-| Frontend | React 18, TypeScript, Canvas API | MRI image rendering |
-| Image Format | JPEG/PNG (initially) | Simple image formats |
-| State | React Context | Simple state management |
-| Styling | CSS/Tailwind | Medical UI design |
-| Backend (minimal) | Node.js/Express | Optional: serve DICOM files |
+| Frontend | React 18, TypeScript, Vite | Modern SPA base |
+| Rendering | **Cornerstone3D** (`@cornerstonejs/core`, `@cornerstonejs/tools`) | GPU-accelerated medical image rendering |
+| DICOM loading | `@cornerstonejs/dicom-image-loader` + `dicom-parser` | Parse DICOM P10 and register image loaders |
+| State | React Context / Zustand | Viewport & UI state |
+| Styling | Tailwind CSS | Medical UI design |
+| Build/Test | Vite, Vitest, React Testing Library | Dev tooling |
+
+**Why Cornerstone3D:** it is the de-facto standard for web medical imaging (the
+engine behind the OHIF Viewer), provides robust DICOM parsing and WebGL rendering,
+and scales from a single 2D viewer up to MPR, segmentation, and PACS integration
+without rewriting the core. This avoids building a throwaway JPEG/PNG prototype
+for genuine clinical DICOM data.
 
 ### Next Steps (Future Versions)
 
-- DICOM file support (OHIF Viewer integration)
-- Multi-planar reconstruction (MPR)
-- 3D visualization
-- Segmentation overlay
-- Clinical annotations
-- Patient management system
+- Multi-planar reconstruction (MPR) via Cornerstone3D volume viewports
+- 3D volume rendering
+- Segmentation overlay and labelmaps
+- DICOMweb (WADO-RS/QIDO-RS) + PACS (e.g. Orthanc) integration
+- Clinical annotations, measurements, and structured reporting
 
 ## Conventions (v1)
 
@@ -114,11 +136,13 @@ This document defines the requirements, specifications, and conventions for the 
 
 ## Acceptance Criteria (v1)
 
-- Users can load MRI images from local storage
-- Images display correctly with basic navigation
-- Zoom and pan functionality works smoothly
-- Image metadata displays correctly
-- No critical errors on supported browsers
+- Users can load real DICOM files/series from local storage (drag & drop or picker)
+- MRI slices render with correct window/level (VOI LUT) and grayscale
+- Users can scroll through all slices of a series smoothly
+- Zoom, pan, and window/level adjustment work correctly
+- DICOM metadata (patient, study, series, sequence) is displayed
+- Malformed or unsupported DICOM files produce a clear error message
+- Large series (hundreds of slices) load without freezing the UI
 
 ## References
 
