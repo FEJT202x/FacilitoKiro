@@ -1,0 +1,29 @@
+{
+  "version": "v1",
+  "agents": [
+    {
+      "name": "web-developer",
+      "description": "Custom agent for Vue 3/Node.js medical imaging web application development",
+      "role": "senior-developer",
+      "capabilities": [
+        "code_generation",
+        "code_review",
+        "debugging",
+        "testing"
+      ],
+      "configuration": {
+        "max_retries": 3,
+        "timeout_seconds": 300,
+        "preferred_language": "typescript"
+      },
+      "knowledge_base": [
+        "vue3_typescript",
+        "cornerstone3d",
+        "dicom",
+        "express_js",
+        "postgresql",
+        "docker"
+      ]
+    }
+  ]
+}
