@@ -16,7 +16,7 @@ This document defines the development workflows and processes for the Prostate M
 - [ ] Document security requirements
 
 ### Phase 3: Development (v1 - DICOM Viewer)
-- [ ] Set up React + TypeScript + Vite project
+- [ ] Set up Vue 3 + TypeScript + Vite project
 - [ ] Integrate Cornerstone3D and DICOM image loader
 - [ ] Implement DICOM file/series loading (drag & drop / picker)
 - [ ] Render slices with window/level (VOI LUT)
@@ -113,23 +113,66 @@ gh api repos/OWNER/REPO/pulls -f title="..." -f body="..." -f head="feature/user
 
 ## Coding Standards
 
-### TypeScript/React
+### Vue 3 + TypeScript (Composition API, `<script setup>`)
+
+```vue
+<!-- ✅ Good: DicomViewport.vue -->
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+
+interface Props {
+  seriesId: string;
+}
+
+const props = defineProps<Props>();
+const viewportRef = ref<HTMLDivElement | null>(null);
+
+onMounted(() => {
+  // initialize Cornerstone3D viewport on viewportRef.value
+});
+</script>
+
+<template>
+  <div ref="viewportRef" class="dicom-viewport" />
+</template>
+```
+
+```vue
+<!-- ❌ Bad: no types, logic in template, Options API mixed with globals -->
+<script>
+export default {
+  data() { return { s: this.$root.series } },
+  mounted() { init(document.querySelector('.v')) }
+}
+</script>
+```
+
+### Composables (reusable logic)
 
 ```typescript
-// ✅ Good
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
+// ✅ Good: useDicomLoader.ts
+import { ref } from 'vue';
 
-function getUserById(id: string): User | undefined {
-  return users.find(user => user.id === id);
-}
+export function useDicomLoader() {
+  const isLoading = ref(false);
+  const error = ref<string | null>(null);
 
-// ❌ Bad
-const user = {id:'1',name:'John'};
-function gUB(id){return users.find(u=>u.id===id);}
+  async function loadSeries(files: File[]): Promise<string[]> {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      // parse + register imageIds with Cornerstone3D
+      return [];
+    } catch (e) {
+      error.value = 'Failed to load DICOM series';
+      throw e;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  return { isLoading, error, loadSeries };
+}
 ```
 
 ### Node.js/Express
@@ -167,9 +210,10 @@ app.get('/users', (req, res) => {
 ### OHIF Viewer
 
 - Open-source medical imaging viewer
-- Built on React and cornerstone3D
+- Built on React and Cornerstone3D
 - DICOM support out of the box
-- Can be embedded or used as a base
+- Reference implementation only — this project uses Cornerstone3D directly with Vue 3
+  (Cornerstone3D is framework-agnostic and integrates cleanly with Vue)
 
 ### Image Formats
 
@@ -205,7 +249,7 @@ app.get('/users', (req, res) => {
 
 1. **Linting**
    ```bash
-   npm run lint:frontend    # TypeScript/React
+   npm run lint:frontend    # Vue 3 / TypeScript
    npm run lint:backend     # Node.js
    ```
 

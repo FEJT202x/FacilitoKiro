@@ -30,8 +30,10 @@ prostate-mri-viewer/
 ├── projects/                  # Project environments
 │   └── sandbox/              # Development environment
 ├── src/                       # Source code
-│   ├── components/           # React components
+│   ├── components/           # Vue 3 components (.vue)
 │   │   └── mri-viewer/       # MRI viewer specific components
+│   ├── composables/          # Vue composables (useXxx.ts)
+│   ├── stores/               # Pinia stores
 │   ├── services/             # API services
 │   ├── utils/                # Utility functions
 │   └── types/                # TypeScript type definitions
@@ -75,7 +77,8 @@ Sample medical imaging data for development and testing (DICOM files, etc.).
 
 | Layer | Technology | Notes |
 |-------|-----------|-------|
-| Frontend | React 18, TypeScript, Vite | Modern SPA base |
+| Frontend | Vue 3 (Composition API), TypeScript, Vite | Modern SPA base |
+| State | Pinia | Viewport & UI state |
 | Rendering | Cornerstone3D (WebGL) | GPU-accelerated DICOM/MRI rendering (v1) |
 | DICOM loading | @cornerstonejs/dicom-image-loader + dicom-parser | Parse DICOM P10, register image loaders (v1) |
 | Backend | Node.js, Express.js | DICOMweb proxy / metadata API (v4+) |

@@ -1,6 +1,6 @@
 # Prostate MRI Viewer
 
-A web-based medical imaging viewer for prostate cancer MRI scans, built with React and TypeScript.
+A web-based DICOM medical imaging viewer for prostate cancer MRI scans, built with Vue 3, TypeScript, and Cornerstone3D.
 
 ## Overview
 
@@ -34,7 +34,7 @@ prostate-mri-viewer/
 ├── projects/                  # Project environments
 │   └── sandbox/              # Development environment
 ├── src/                       # Source code
-│   ├── components/           # React components
+│   ├── components/           # Vue 3 components (.vue)
 │   ├── services/             # API services
 │   └── utils/                # Utility functions
 ├── tests/                     # Test files

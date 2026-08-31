@@ -70,7 +70,7 @@ real DICOM files, preserving clinical metadata, pixel spacing, and window/level.
 ┌───────────────────────────────────────────────┐
 │               Client Browser                   │
 │  ┌─────────────────────────────────────────┐  │
-│  │   MRI Viewer (React + TypeScript)       │  │
+│  │   MRI Viewer (Vue 3 + TypeScript)       │  │
 │  │   ┌───────────────────────────────────┐ │  │
 │  │   │ Cornerstone3D (WebGL rendering)   │ │  │
 │  │   │  - Viewport / stack rendering     │ │  │
@@ -90,12 +90,12 @@ real DICOM files, preserving clinical metadata, pixel spacing, and window/level.
 
 | Layer | Technology | Notes |
 |-------|-----------|-------|
-| Frontend | React 18, TypeScript, Vite | Modern SPA base |
+| Frontend | Vue 3 (Composition API), TypeScript, Vite | Modern SPA base |
 | Rendering | **Cornerstone3D** (`@cornerstonejs/core`, `@cornerstonejs/tools`) | GPU-accelerated medical image rendering |
 | DICOM loading | `@cornerstonejs/dicom-image-loader` + `dicom-parser` | Parse DICOM P10 and register image loaders |
-| State | React Context / Zustand | Viewport & UI state |
+| State | Pinia | Viewport & UI state |
 | Styling | Tailwind CSS | Medical UI design |
-| Build/Test | Vite, Vitest, React Testing Library | Dev tooling |
+| Build/Test | Vite, Vitest, Vue Test Utils | Dev tooling |
 
 **Why Cornerstone3D:** it is the de-facto standard for web medical imaging (the
 engine behind the OHIF Viewer), provides robust DICOM parsing and WebGL rendering,
@@ -118,7 +118,7 @@ for genuine clinical DICOM data.
 | Language | Style Guide | Linter |
 |----------|-------------|--------|
 | TypeScript | Airbnb Style Guide | ESLint |
-| React | React Hooks best practices | React Testing Library |
+| Vue 3 | Vue Style Guide (Composition API, `<script setup>`) | ESLint + eslint-plugin-vue |
 
 ### Git Conventions
 
@@ -129,9 +129,10 @@ for genuine clinical DICOM data.
 
 ### File Naming
 
-- Components: `PascalCase.tsx`, `PascalCase.ts`
+- Components: `PascalCase.vue`
+- Composables: `useCamelCase.ts`
 - Utilities: `camelCase.ts`
-- Tests: `*.test.tsx`, `*.spec.ts`
+- Tests: `*.test.ts`, `*.spec.ts`
 - MRI viewer components: `src/components/mri-viewer/`
 
 ## Acceptance Criteria (v1)
