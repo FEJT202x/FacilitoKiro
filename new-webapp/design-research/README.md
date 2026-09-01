@@ -1,14 +1,13 @@
 # Design Research — Prostate MRI Viewer
 
-> ## ⛔ STATUS: DRAFT — NOT FOR IMPLEMENTATION
+> ## ✅ STATUS: COMPLETED — APPROVED FOR IMPLEMENTATION
 >
-> **All content in this directory is for the DESIGN phase only.**
+> The design research and the resulting UI/interaction design have been reviewed
+> and **approved**. Implementation may proceed based on these documents and the
+> reconciled formal design at `docs/architecture/design-v1.md`.
 >
-> It gathers research (consulted sources + analysis) and the resulting UI design.
-> **Nothing here may be used as a basis for implementation until this document is
-> explicitly marked as `COMPLETED` below.**
->
-> While status is `DRAFT`, the design is under review and may change.
+> Changes after approval must follow the SDD Post-Change Workflow (commit + update
+> docs) and, if they alter design intent, be re-approved here.
 
 ---
 
@@ -16,13 +15,12 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | `DRAFT` |
-| **Approved by** | _(pending)_ |
-| **Approved date** | _(pending)_ |
+| **Status** | `COMPLETED` |
+| **Approved by** | Client (project owner) |
+| **Approved date** | 2026-08-22 |
 
-To release this design for implementation, the reviewer must change **Status** to
-`COMPLETED`, fill in approver and date, and commit that change. Until then,
-implementation work must **not** start from these documents.
+The design is approved. Resolved decisions (see `05-interactions.md` "Decisions")
+and the 2-button trackpad input constraint are now the basis for implementation.
 
 ---
 

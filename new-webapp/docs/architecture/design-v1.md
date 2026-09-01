@@ -404,6 +404,41 @@ function useViewport(element: Ref<HTMLDivElement | null>): {
 - Sequence switcher (top-right) lists series of the loaded study (v1: FR-007).
 - Tailwind CSS; dark theme by default (standard for radiology reading).
 
+> **Approved UI/interaction source of truth:** `design-research/` (Status:
+> COMPLETED, approved 2026-08-22). The wireframes here are consistent with it; the
+> research directory holds the full rationale, sources, and traceability.
+
+### 7.9 Interaction model (approved — 2-button trackpad, keyboard-first)
+
+v1 targets a **2-button trackpad** (no wheel, no middle/extra buttons). The
+**keyboard is the primary navigation path**; two-finger scroll is an optional
+accelerator. Faithful rendering only — no app-side gamma/tone/color (GSDF).
+
+**Pointer (2 buttons):**
+
+| Input | Action |
+|-------|--------|
+| Left drag | Active tool (default **Window/Level**) |
+| Right drag | Zoom (fixed) |
+| Shift + left drag | Pan |
+| Two-finger scroll (if available) | Scroll slices (optional) |
+| Double-click | Fit to viewport |
+| Right-click (no drag) | Context menu: tools + presets |
+
+**Keyboard:**
+
+| Keys | Action |
+|------|--------|
+| Arrows / PageUp-Down / Home-End | Slice navigation (primary) |
+| `W` `S` `Z` `P` `R` | Window/Level · Scroll-drag · Zoom · Pan · Reset |
+| `[` `]` · `-` `=` · `0` | Window width · window center · reset to stored VOI |
+| `Space` | Cine play/pause |
+| `1`…`9` | Switch series (T2/DWI/ADC…) |
+| `I` · `F` · `?` · `Esc` | Metadata · Fullscreen · Cheat-sheet · Close/cancel |
+
+**Window/Level policy:** default to the series' **DICOM-stored VOI LUT**; provide
+recallable manual presets. No hardcoded numeric WW/WC presets in v1.
+
 ---
 
 ## 8. Core Flows
