@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Dark, image-first reading environment (see design-research/03 & 04). */
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden; /* the viewer owns the screen; no page scroll */
+}
+
+/* Cornerstone viewport elements must not show the browser's focus outline
+   or a text cursor; interaction is handled by tools. */
+.cs-viewport {
+  outline: none;
+  user-select: none;
+}
