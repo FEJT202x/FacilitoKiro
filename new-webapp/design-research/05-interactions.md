@@ -8,30 +8,35 @@
 
 1. **Match convention, don't invent.** Defaults mirror RadiAnt/MicroDICOM so users
    are productive immediately [C4].
-2. **Keyboard-first.** Every core action has a key; the mouse is for direct
+2. **Keyboard-first.** Every core action has a key; the pointer is for direct
    manipulation on the image [F2].
-3. **No reliance on 4th/5th mouse buttons** — provide modifier/keyboard equivalents
-   [C6].
-4. **Single active "left-drag tool"** switched by one key, plus fixed
-   right/middle/wheel behaviors that rarely change (like RadiAnt) [F1].
+3. **2-button trackpad only (v1 constraint).** No wheel, no middle button, no
+   4th/5th buttons. The keyboard is the primary navigation path; two-finger scroll
+   is an optional accelerator [C6].
+4. **Single active "left-drag tool"** switched by one key; **right-drag = zoom**
+   (fixed) [F1].
 
-## Mouse — default mapping
+## Input device (v1): 2-button trackpad, no wheel
+
+Target workstations have a **two-button trackpad** — no scroll wheel, no middle
+button, no 4th/5th buttons. Interactions must work with: left button, right button,
+an optional **two-finger scroll** gesture (browsers report it as wheel events), and
+the keyboard. The **keyboard is the reliable primary** for navigation.
+
+### Pointer mapping (2 buttons)
 
 | Input | Action | Note |
 |-------|--------|------|
-| **Wheel** | Scroll slices | Most frequent action; always active [F3] |
-| **Left drag** | Active tool (default: Window/Level) | Tool chosen by toolbar/keys [F1] |
-| **Middle drag** | Pan | Fixed |
+| **Left drag** | Active tool (default: Window/Level) | Tool switched by keys [F1] |
 | **Right drag** | Zoom | Fixed (matches RadiAnt right-drag zoom [S5]) |
+| **Shift + left drag** | Pan | No middle button needed [C6] |
+| **Two-finger scroll** (if available) | Scroll slices | Optional accelerator; not required [F3] |
 | **Double-click** | Fit image to viewport | Quick reset of pan/zoom |
-| **Shift + left drag** | Pan (equivalent, no middle button needed) | For limited mice [C6] |
-| **Ctrl + left drag** | Zoom (equivalent) | For limited mice [C6] |
+| **Right-click (no drag)** | Context menu: tools + presets | Discoverability with only 2 buttons |
 
-> Rationale: RadiAnt uses left-drag to browse slices and middle-drag for
-> window/level [S5]. We instead keep the **wheel** for slice scrolling (universal
-> and always-on) and make **left-drag = the selected tool**, defaulting to
-> Window/Level, which is the most continuously adjusted parameter while reading.
-> This is documented as an explicit divergence for review (see Open question OQ-1).
+> Because there is **no wheel or middle button**, the reliable path for slice
+> navigation is the **keyboard** (arrows / PageUp-Down / Home-End) and the on-screen
+> **slider**; two-finger scroll is a convenience when the trackpad supports it.
 
 ## Keyboard — tools (single key) [S9]
 
@@ -86,23 +91,38 @@ Open question OQ-3.
 - Focus order is logical; the viewport is focusable for key navigation.
 - Shortcuts avoid clashing with common screen-reader/browser keys where feasible.
 
-## Open questions for review
+## Decisions (resolved open questions)
 
-- **OQ-1**: Default left-drag = Window/Level (our proposal) vs left-drag = Scroll
-  (RadiAnt default [S5]). Which matches the client's radiologists' habit?
-- **OQ-2**: Should the wheel scroll slices (our default) or zoom? Convention favors
-  slice scroll; confirm.
-- **OQ-3**: Preferred prostate WW/WC presets (per sequence: T2 vs DWI vs ADC)?
-- **OQ-4**: Are 4th/5th mouse buttons available on the clinical workstations, or
-  must we assume a 3-button mouse only?
+Resolved by the maintainer, adjusted to the research and the 2-button trackpad
+constraint. Rationale is traced to findings [F#] / constraints [C#] / sources [S#].
+
+- **OQ-1 → DECIDED: default left-drag = Window/Level.** W/L is the most
+  continuously adjusted parameter and needs 2-axis drag precision the keyboard
+  serves poorly. Slice navigation is well covered by keyboard + slider + optional
+  two-finger scroll, so the single left-drag tool is best spent on W/L by default.
+  Pressing `S` switches left-drag to slice-scrub for physicians who prefer dragging.
+  [F1, F2, C3]
+- **OQ-2 → DECIDED: two-finger scroll = slice navigation** (never zoom), matching
+  universal convention [F3]. Zoom is right-drag or the `Z` tool [S5]. Since the
+  wheel is not guaranteed, keyboard/slider remain the primary slice controls [C6].
+- **OQ-3 → DECIDED: use the series' DICOM-stored VOI LUT** as the default
+  window/level, plus **recallable manual presets** (the mechanism is designed).
+  We do **not hardcode arbitrary numeric WW/WC presets** in v1: inventing numbers
+  without real sample data or the client's radiologists would violate faithful-
+  rendering principles [S1] and PI-RADS reading practice [S17-S19]. Per-sequence
+  numeric presets are captured later from real data/radiologist input (tracked,
+  non-blocking).
+- **OQ-4 → RESOLVED by constraint: 2-button trackpad only.** No wheel, middle, or
+  extra buttons. Keyboard is the primary navigation path; two-finger scroll is an
+  optional accelerator. All mappings above respect this [C6].
 
 ## Traceability
 
 | Interaction decision | Traces to |
 |-----------------------|-----------|
-| Wheel = slice scroll, always on | F3 |
+| Keyboard/slider = primary slice nav; two-finger scroll optional | F3, C6 |
 | Single-key tools (W/S/Z/P/R) | F2, S9 |
-| Fixed right=zoom, middle=pan + modifier equivalents | F1, S5, C6 |
+| Fixed right-drag=zoom; Shift+left=pan (no middle/wheel) | F1, S5, C6 |
 | Cine on Space | F3, S9 |
 | Series keys 1..9 | F5 |
 | Cheat-sheet + text tool state | F2, C7 |

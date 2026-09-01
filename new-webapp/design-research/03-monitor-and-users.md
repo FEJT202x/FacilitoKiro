@@ -58,7 +58,7 @@ Their constraints and expectations, derived from workflow and ergonomics sources
 | **Multiparametric comparison (T2/DWI/ADC)** [S17-S19] | Fast sequence switching now; comparison later |
 | **Prolonged sessions → fatigue** [S12][S16] | Dark theme, low-luminance chrome, no animation/flicker |
 | **Precision matters (diagnosis)** | Faithful rendering; visible WW/WC and slice index; no auto image "enhancement" |
-| **Mixed input hardware** (mouse, sometimes limited buttons) | Don't rely on 4th/5th mouse buttons; provide modifier/keyboard equivalents |
+| **Input hardware: 2-button trackpad (v1)** | No wheel/middle/extra buttons; keyboard is the primary navigation path; two-finger scroll optional |
 | **Accuracy of identifiers** | Persistent patient/series/slice overlays to prevent mix-ups |
 
 ### Accessibility / practical notes
@@ -74,6 +74,7 @@ Their constraints and expectations, derived from workflow and ergonomics sources
 3. **Keyboard-first, few-clicks** interaction for high-volume time-pressured work.
 4. **Familiar conventions** from established viewers; no novel gestures.
 5. **Persistent overlays** for identifiers, slice index, WW/WC.
-6. **No reliance on exotic mouse buttons**; provide keyboard/modifier equivalents.
+6. **2-button trackpad only (v1)**: no wheel/middle/extra buttons; keyboard-first
+   navigation, with two-finger scroll as an optional accelerator.
 7. **No color-only information encoding**.
 8. Design must extend to **sequence comparison** for mpMRI without rework.

@@ -63,7 +63,7 @@ it overlays/pushes from the right; reading does not require it to be visible.
 ## The core reading loop (must be frictionless) [F1][F2]
 
 1. Load a DICOM series → viewport fills, defaults applied.
-2. **Scroll** slices (wheel / drag / arrows / slider).
+2. **Scroll** slices (arrows / slider / two-finger scroll / `S`-tool drag).
 3. **Window/Level** by dragging (or `W` then drag).
 4. **Zoom / Pan** as needed.
 5. Switch **sequence** (T2 / DWI / ADC) — 1/2/3 keys.
@@ -142,7 +142,7 @@ and the dark/calibrated-monitor constraints.
 | No app-side image processing; faithful pixels | C1 (GSDF) |
 | Persistent corner overlays (ID, slice, WW/WC) | F6, C5 |
 | Keyboard-first, frictionless core loop | F1, F2, C3 |
-| Redundant slice controls (wheel/drag/arrow/slider/cine) | F3 |
+| Redundant slice controls (arrows/slider/two-finger scroll/cine) | F3, C6 |
 | Sequence toggles + comparison-ready IA | F5, C4 |
 | Familiar mouse/key mappings, no novel gestures | F1, F2, C4 |
 | Inline non-blocking errors, no modal walls | anti-patterns |
