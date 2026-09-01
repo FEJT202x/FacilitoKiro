@@ -195,6 +195,215 @@ the same core can back the React branch.
 `dicom.ts` — `DicomSeries`, `DicomInstanceMetadata`, `PatientInfo`, `StudyInfo`,
 `ViewerTool` (`'zoom' | 'pan' | 'windowLevel' | 'scroll'`).
 
+### 7.5 Component hierarchy diagram
+
+```
+App.vue
+└── ViewerPage.vue                     ← layout + orchestration
+    ├── ViewerToolbar.vue              ← tool buttons + slice indicator
+    ├── DicomDropzone.vue              ← shown only when no series is loaded
+    ├── DicomViewport.vue              ← owns the Cornerstone viewport element
+    │   └── LoadingOverlay.vue         ← shown while parsing / on error
+    └── MetadataPanel.vue              ← patient/study/series metadata
+```
+
+### 7.6 Component interaction (props down / events up / store)
+
+```
+                          ┌─────────────────────────┐
+                          │        ViewerPage        │
+                          │  (reads Pinia stores)    │
+                          └───────────┬─────────────┘
+        props / events                │            props / events
+      ┌───────────────┬───────────────┼───────────────┬───────────────┐
+      v               v               v               v               v
+┌───────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐
+│ Viewer    │  │ Dicom      │  │ Dicom      │  │ Metadata   │  │ Loading    │
+│ Toolbar   │  │ Dropzone   │  │ Viewport   │  │ Panel      │  │ Overlay    │
+└─────┬─────┘  └─────┬──────┘  └─────┬──────┘  └─────┬──────┘  └─────┬──────┘
+      │              │               │               │               │
+  @tool-change   @files-        useViewport()     props:          props:
+  @slice-change  selected       binds element     series          loading,
+      │              │          + tools            (from store)    error
+      v              v               │
+ viewportStore   useDicomLoader ─────┘
+ (activeTool,    -> studyStore
+  sliceIndex,      (series,
+  ww/wc)           metadata)
+
+Legend:
+  - props flow DOWN (parent -> child)
+  - events flow UP  (child -> parent, e.g. @files-selected, @tool-change)
+  - shared state lives in Pinia stores (studyStore, viewportStore)
+  - composables (useViewport / useDicomLoader) bridge to Cornerstone3D
+```
+
+Data direction rule: **props down, events up, shared state in Pinia.** Components
+never call Cornerstone3D directly except `DicomViewport`, which delegates to
+`useViewport()`.
+
+### 7.7 Interface contracts (TypeScript)
+
+Data model (`src/types/dicom.ts`):
+
+```typescript
+export interface PatientInfo {
+  id: string;             // de-identified in v1
+  name?: string;
+  sex?: 'M' | 'F' | 'O';
+  age?: string;
+}
+
+export interface StudyInfo {
+  studyInstanceUID: string;
+  studyDescription?: string;
+  studyDate?: string;
+}
+
+export interface DicomInstanceMetadata {
+  sopInstanceUID: string;
+  instanceNumber: number;
+  rows: number;
+  columns: number;
+  windowWidth?: number;
+  windowCenter?: number;
+  imagePositionPatient?: [number, number, number];
+}
+
+export interface DicomSeries {
+  seriesInstanceUID: string;
+  seriesDescription?: string;   // e.g. "T2 TSE ax", "DWI", "ADC"
+  modality: string;             // "MR"
+  imageIds: string[];           // ordered Cornerstone imageIds
+  instances: DicomInstanceMetadata[];
+  patient: PatientInfo;
+  study: StudyInfo;
+}
+
+export type ViewerTool = 'zoom' | 'pan' | 'windowLevel' | 'scroll';
+```
+
+Component prop/event contracts:
+
+```typescript
+// DicomDropzone.vue
+defineProps<{ disabled?: boolean }>();
+defineEmits<{ (e: 'files-selected', files: File[]): void }>();
+
+// DicomViewport.vue
+defineProps<{ imageIds: string[]; sliceIndex: number; activeTool: ViewerTool }>();
+defineEmits<{ (e: 'slice-change', index: number): void }>();
+
+// ViewerToolbar.vue
+defineProps<{ activeTool: ViewerTool; sliceIndex: number; numSlices: number }>();
+defineEmits<{
+  (e: 'tool-change', tool: ViewerTool): void;
+  (e: 'slice-change', index: number): void;
+  (e: 'reset-view'): void;
+}>();
+
+// MetadataPanel.vue
+defineProps<{ series: DicomSeries | null }>();
+
+// LoadingOverlay.vue
+defineProps<{ loading: boolean; error?: string | null; progress?: number }>();
+```
+
+Composable signatures (`src/composables/`):
+
+```typescript
+// useCornerstone.ts
+function useCornerstone(): {
+  init(): Promise<void>;
+  isInitialized: Ref<boolean>;
+  teardown(): void;
+};
+
+// useDicomLoader.ts
+function useDicomLoader(): {
+  isLoading: Ref<boolean>;
+  progress: Ref<number>;
+  error: Ref<string | null>;
+  loadSeries(files: File[]): Promise<DicomSeries>;
+};
+
+// useViewport.ts
+function useViewport(element: Ref<HTMLDivElement | null>): {
+  loadStack(imageIds: string[], initialVoi?: { ww: number; wc: number }): Promise<void>;
+  setSlice(index: number): void;
+  setWindowLevel(ww: number, wc: number): void;
+  setActiveTool(tool: ViewerTool): void;
+  resetCamera(): void;
+};
+```
+
+### 7.8 UI / Interface design (wireframes)
+
+**A. Empty state — no series loaded**
+
+```
+┌────────────────────────────────────────────────────────────┐
+│  Prostate MRI Viewer                                    (⚙)  │  <- app header
+├────────────────────────────────────────────────────────────┤
+│                                                              │
+│            ┌──────────────────────────────────┐             │
+│            │                                    │             │
+│            │        (^) Drop DICOM files        │             │
+│            │           or click to browse       │             │
+│            │                                    │             │
+│            │     Supports .dcm files / series   │             │
+│            └──────────────────────────────────┘             │
+│                    (DicomDropzone)                           │
+│                                                              │
+└────────────────────────────────────────────────────────────┘
+```
+
+**B. Loaded state — viewing a series**
+
+```
+┌────────────────────────────────────────────────────────────┐
+│  Prostate MRI Viewer                    Series: T2 TSE ax v  │  header + sequence switch
+├──────────────────────────────────────────────┬─────────────┤
+│ [Zoom] [Pan] [W/L] [Scroll] [Reset]           │  Metadata   │  <- ViewerToolbar
+│                                                │             │
+│  ┌──────────────────────────────────────────┐ │  Patient    │
+│  │                                          │ │  ID: ****    │
+│  │                                          │ │  Sex: M      │
+│  │            MRI slice (canvas)            │ │             │
+│  │          Cornerstone3D viewport          │ │  Study      │
+│  │                                          │ │  Date: ...   │
+│  │                                          │ │  Desc: ...   │
+│  │                                          │ │             │
+│  │                                          │ │  Series     │
+│  │  WW: 400  WC: 40           Slice 12 / 30 │ │  MR · T2 ax  │
+│  └──────────────────────────────────────────┘ │  512 x 512   │
+│  |------------------o-----------------------|  │ (MetadataPanel)
+│         slice slider (1 ... 30)                │             │
+├──────────────────────────────────────────────┴─────────────┤
+│  Status: 30 slices loaded · GPU rendering                    │  <- status bar
+└──────────────────────────────────────────────────────────────┘
+   (DicomViewport = central canvas; overlays show WW/WC + slice index)
+```
+
+**C. Loading / error state (LoadingOverlay over the viewport)**
+
+```
+┌──────────────────────────────────────────┐     ┌──────────────────────────────┐
+│                                          │     │  (!) Could not read file      │
+│            Parsing DICOM...              │     │  "scan.txt" is not valid      │
+│         ############........  68%        │ or  │  DICOM. Other files loaded.   │
+│                                          │     │              [ Dismiss ]      │
+└──────────────────────────────────────────┘     └──────────────────────────────┘
+```
+
+**Layout notes**
+- 3-zone desktop layout: top toolbar, central viewport (flex-grow), right metadata
+  panel (fixed ~280px). Status bar at the bottom.
+- Viewport overlays (WW/WC bottom-left, slice index bottom-right) are drawn by
+  Cornerstone3D, not DOM.
+- Sequence switcher (top-right) lists series of the loaded study (v1: FR-007).
+- Tailwind CSS; dark theme by default (standard for radiology reading).
+
 ---
 
 ## 8. Core Flows
